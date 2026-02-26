@@ -89,9 +89,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public ServiceOrder updateOrderStatus(String orderId, String status) {
-        ServiceOrder order = getOrderById(orderId);
-
-        // 将字符串状态转换为枚举
+        // 将字符串转为枚举
         OrderStatus orderStatus;
         try {
             orderStatus = OrderStatus.fromDescription(status);
@@ -99,7 +97,8 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("无效的订单状态: " + status);
         }
 
-        order.setStatus(orderStatus);  // 使用枚举
+        ServiceOrder order = getOrderById(orderId);
+        order.setStatus(orderStatus);
         return serviceOrderRepository.save(order);
     }
 
@@ -175,7 +174,7 @@ public class OrderServiceImpl implements OrderService {
         );
     }
 
-    // 可选：添加一个使用枚举参数的重载方法
+    // 新增重载方法（供内部调用）
     @Transactional
     public ServiceOrder updateOrderStatus(String orderId, OrderStatus status) {
         ServiceOrder order = getOrderById(orderId);

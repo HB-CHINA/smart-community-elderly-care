@@ -5,8 +5,9 @@ import com.huangbin.smartcommunityelderlycare.repository.UserRepository;
 import com.huangbin.smartcommunityelderlycare.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,11 +17,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;  // 从SecurityConfig注入
 
     /**
      * 用户注册
      */
+    @Override
+    @Transactional
     public User register(User user) {
         // 验证手机号格式
         if (user.getPhone() == null || !user.getPhone().matches("^1[3-9]\\d{9}$")) {
@@ -54,6 +58,8 @@ public class UserServiceImpl implements UserService {
     /**
      * 用户登录
      */
+    @Override
+    @Transactional
     public User login(String phone, String password) {
         // 查找用户
         User user = userRepository.findByPhone(phone)
@@ -70,6 +76,15 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+
+    @Override
+    @Transactional
+    public void updateAvatar(Long userId, String avatarPath) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("用户不存在"));
+        user.setAvatar(avatarPath);
+        userRepository.save(user);
     }
 
     /**

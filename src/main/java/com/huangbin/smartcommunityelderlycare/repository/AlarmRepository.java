@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,4 +58,10 @@ public interface AlarmRepository extends JpaRepository<AlarmRecord, Long> {
             "AND a.alarmType = '健康数据异常预警' " +
             "AND DATE(a.triggerTime) = CURRENT_DATE")
     boolean existsTodayHealthAlert(@Param("elderId") Long elderId);
+    // 添加到 AlarmRepository.java 中
+    @Query("SELECT COUNT(a) FROM AlarmRecord a WHERE a.alarmType = :type AND DATE(a.triggerTime) = :date")
+    Long countByAlarmTypeAndDate(@Param("type") String type, @Param("date") LocalDate date);
+
+    @Query("SELECT COUNT(a) FROM AlarmRecord a WHERE a.alarmType = :type AND a.status = :status AND DATE(a.triggerTime) = :date")
+    Long countByAlarmTypeAndStatusAndDate(@Param("type") String type, @Param("status") String status, @Param("date") LocalDate date);
 }

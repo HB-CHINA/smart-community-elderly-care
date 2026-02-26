@@ -84,32 +84,16 @@ public class AuthInterceptor implements HandlerInterceptor {
      * 如果是Token认证，解析Token
      */
     private Long getUserIdFromRequest(HttpServletRequest request) {
-        // 方式1：从Session获取（如果使用Session）
-        // Long userId = (Long) request.getSession().getAttribute("userId");
-
-        // 方式2：从Header获取（如果使用简单token）
+        // 从Header获取token（这里简单处理，实际应为JWT解析）
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
-            // 这里应该解析JWT token获取userId
-            // 暂时模拟：假设token就是userId
             try {
-                return Long.parseLong(token);
+                return Long.parseLong(token);  // 暂时直接解析为userId
             } catch (NumberFormatException e) {
                 return null;
             }
         }
-
-        // 方式3：从参数获取（为了测试方便）
-        String userIdParam = request.getParameter("userId");
-        if (userIdParam != null) {
-            try {
-                return Long.parseLong(userIdParam);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
-
         return null;
     }
 }

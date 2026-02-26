@@ -9,4 +9,5 @@ public interface UserService {
     List<User> getAllUsers();
     List<User> getUsersByRole(String role);
     User getUserById(Long id);
+    void updateAvatar(Long userId, String avatarPath);
 }

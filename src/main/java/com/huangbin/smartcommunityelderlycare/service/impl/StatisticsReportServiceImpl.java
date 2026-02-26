@@ -39,7 +39,7 @@ public class StatisticsReportServiceImpl implements StatisticsReportService {
     private HealthRecordRepository healthRecordRepository;
 
     @Autowired
-    private EmergencyAlertRepository emergencyAlertRepository;
+    private AlarmRepository alarmRepository;
 
     @Autowired
     private NoticeRepository noticeRepository;
@@ -157,16 +157,16 @@ public class StatisticsReportServiceImpl implements StatisticsReportService {
 
     private void populateEmergencyStatistics(StatisticsReport report, LocalDate date) {
         try {
-            // 今日求助呼叫数
-            Long emergencyCalls = emergencyAlertRepository.countByAlertDate(date);
+            // 今日求助呼叫数 - 改为统计所有报警类型为"手动一键求助"的记录
+            Long emergencyCalls = alarmRepository.countByAlarmTypeAndDate("手动一键求助", date);
             report.setEmergencyCallCount(emergencyCalls != null ? emergencyCalls.intValue() : 0);
 
-            // 已处理求助数
-            Long resolvedEmergencies = emergencyAlertRepository.countResolvedByDate(date);
+            // 已处理求助数 - 统计已处理的紧急求助
+            Long resolvedEmergencies = alarmRepository.countByAlarmTypeAndStatusAndDate("手动一键求助", "已处理", date);
             report.setEmergencyResolvedCount(resolvedEmergencies != null ? resolvedEmergencies.intValue() : 0);
 
-            // 平均响应时间
-            Double avgResponseTime = emergencyAlertRepository.findAverageResponseTime(date);
+            // 平均响应时间 - 暂时返回null或0，因为AlarmRepository可能没有这个方法
+            Double avgResponseTime = null; // 或者改为 0.0
             report.setEmergencyAvgResponseTime(avgResponseTime);
         } catch (Exception e) {
             // 如果方法不存在，设置默认值

@@ -21,6 +21,10 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
+    // 头像存储路径
+    @Column(length = 255)
+    private String avatar;
+
     // 在phone字段上添加这2行验证注解 ↓
     @NotBlank(message = "手机号不能为空")
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")

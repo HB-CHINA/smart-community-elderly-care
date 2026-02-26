@@ -80,4 +80,42 @@ public class CheckInController {
             return Result.error("查询失败: " + e.getMessage());
         }
     }
+    /**
+     * 老人签到（核心功能）
+     */
+    @PostMapping
+    public Result<CheckIn> checkIn(@RequestParam Long userId) {
+        try {
+            CheckIn checkIn = checkInService.checkIn(userId);
+            return Result.success("签到成功", checkIn);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 查询老人今日签到状态
+     */
+    @GetMapping("/status")
+    public Result<Boolean> getTodayCheckInStatus(@RequestParam Long userId) {
+        try {
+            boolean hasSignedIn = checkInService.getTodayCheckInStatus(userId);
+            return Result.success("查询成功", hasSignedIn);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 获取老人的签到记录列表
+     */
+    @GetMapping("/records")
+    public Result<List<CheckIn>> getCheckInRecords(@RequestParam Long userId) {
+        try {
+            List<CheckIn> records = checkInService.getCheckInRecords(userId);
+            return Result.success(records);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }
