@@ -1,0 +1,79 @@
+src/main/java/com/huangbin/smartcommunityelderlycare/
+├── common/                    # 通用类
+│   └── Result.java
+├── config/                    # 配置
+│   ├── SecurityConfig.java
+│   └── WebConfig.java
+├── controller/                # 控制器
+│   ├── AlarmController.java
+│   ├── CheckInController.java
+│   ├── EmergencyController.java
+│   ├── HealthRecordController.java
+│   ├── NoticeController.java
+│   ├── OrderController.java
+│   ├── PaymentController.java
+│   ├── ServiceController.java
+│   ├── StatisticsController.java
+│   ├── StatisticsReportController.java
+│   ├── UserController.java
+│   └── WarningController.java
+├── dto/                       # 数据传输对象
+│   ├── DailyStatDTO.java
+│   ├── LoginDTO.java
+│   ├── RegisterDTO.java
+│   ├── ServiceDistributionDTO.java
+│   └── TopServiceDTO.java
+├── entity/                    # 实体类
+│   ├── AlarmRecord.java
+│   ├── CheckIn.java
+│   ├── EmergencyAlert.java
+│   ├── HealthRecord.java
+│   ├── Notice.java
+│   ├── PaymentRecord.java
+│   ├── ServiceItem.java
+│   ├── ServiceOrder.java
+│   ├── StatisticsReport.java
+│   └── User.java
+├── exception/                 # 异常
+│   └── GlobalExceptionHandler.java
+├── interceptor/               # 拦截器
+│   └── AuthInterceptor.java
+├── repository/                # 数据访问
+│   ├── AlarmRepository.java
+│   ├── CheckInRepository.java
+│   ├── EmergencyAlertRepository.java
+│   ├── HealthRecordRepository.java
+│   ├── NoticeRepository.java
+│   ├── PaymentRepository.java
+│   ├── ServiceOrderRepository.java
+│   ├── ServiceRepository.java
+│   ├── StatisticsReportRepository.java
+│   └── UserRepository.java
+├── scheduler/                 # 定时任务
+│   └── StatisticsScheduler.java
+├── service/                   # 服务层
+│   ├── impl/                  # 实现类
+│   │   ├── AlarmServiceImpl.java
+│   │   ├── CheckInServiceImpl.java
+│   │   ├── EmergencyAlertServiceImpl.java
+│   │   ├── HealthRecordServiceImpl.java
+│   │   ├── NoticeServiceImpl.java
+│   │   ├── OrderServiceImpl.java
+│   │   ├── ServiceServiceImpl.java
+│   │   ├── StatisticsReportServiceImpl.java
+│   │   ├── StatisticsServiceImpl.java
+│   │   └── UserServiceImpl.java
+│   ├── AlarmService.java
+│   ├── CheckInMonitorService.java
+│   ├── CheckInService.java
+│   ├── EmergencyAlertService.java
+│   ├── HealthRecordService.java
+│   ├── NoticeService.java
+│   ├── OrderService.java
+│   ├── PaymentService.java
+│   ├── ServiceService.java
+│   ├── StatisticsReportService.java
+│   ├── StatisticsService.java
+│   ├── UserService.java
+│   └── WarningService.java
+└── SmartCommunityElderlyCareApplication.java  # 启动类
