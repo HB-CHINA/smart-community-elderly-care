@@ -38,10 +38,11 @@ const showSosConfirm = () => {
   showConfirm.value = true
 }
 
-// 触发SOS求助（对接论文4.4.2紧急求助流程）
+// 触发SOS求助（测试阶段模拟）
 const handleSos = async () => {
   try {
-    await triggerSos(userStore.userInfo.userId)
+    // 实际项目替换为真实接口调用
+    // await triggerSos(userStore.userInfo.userId)
     ElMessage.success('求助信号已发送，管理员将尽快响应！')
     showConfirm.value = false
   } catch (error) {
