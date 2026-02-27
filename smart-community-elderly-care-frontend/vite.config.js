@@ -12,7 +12,7 @@ export default defineConfig({
     }
   },
   server: {
-    port: 8080, // 前端运行端口（与后端8081区分）
+    port: 5175, // 前端运行端口（与后端8080区分）
     open: true, // 自动打开浏览器
     cors: true // 允许跨域
   }
