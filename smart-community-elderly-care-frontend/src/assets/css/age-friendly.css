@@ -1,0 +1,58 @@
+/* 基础适老化：大字体、宽间距 */
+:root {
+  --font-size-base: 16px;
+  --button-height: 44px;
+  --button-font-size: 16px;
+  --input-height: 44px;
+  --input-font-size: 16px;
+}
+
+/* 高对比度模式：黑白强对比，无渐变，醒目边框 */
+.high-contrast {
+  --el-color-primary: #000000;
+  --el-color-danger: #ff0000;
+  --el-bg-color: #ffffff;
+  --el-text-color-primary: #000000;
+  --el-border-color: #000000;
+  --el-card-bg-color: #ffffff;
+  --el-dialog-bg-color: #ffffff;
+  filter: contrast(1.2);
+}
+
+/* 全局大按钮：贴合论文4.1节，按钮尺寸≥44×44px */
+.high-contrast .el-button,
+.el-button {
+  min-height: var(--button-height) !important;
+  font-size: var(--button-font-size) !important;
+  padding: 0 20px !important;
+}
+
+/* 全局大输入框 */
+.high-contrast .el-input__inner,
+.el-input__inner {
+  height: var(--input-height) !important;
+  font-size: var(--input-font-size) !important;
+}
+
+/* 全局大文字 */
+.high-contrast,
+.high-contrast * {
+  font-size: var(--font-size-base) !important;
+  color: #000 !important;
+}
+
+/* 移除渐变、阴影，简化样式（适老化） */
+.high-contrast .el-card,
+.high-contrast .el-dialog,
+.high-contrast .el-table {
+  box-shadow: none !important;
+  border: 2px solid #000 !important;
+}
+
+/* 表格高对比度：隔行变色为黑白 */
+.high-contrast .el-table__row:nth-child(odd) {
+  background-color: #f5f5f5 !important;
+}
+.high-contrast .el-table__row:nth-child(even) {
+  background-color: #ffffff !important;
+}
