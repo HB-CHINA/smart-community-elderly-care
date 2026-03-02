@@ -1,17 +1,24 @@
+<!-- src/views/error/403.vue -->
 <template>
   <div class="error-container">
     <el-card class="error-card">
-      <h2 class="error-code">403</h2>
-      <p class="error-desc">您暂无权限访问该页面</p>
-      <el-button type="primary" @click="goBack">返回上一页</el-button>
+      <div class="error-icon">
+        <el-icon :size="100"><Close /></el-icon>
+      </div>
+      <h2 class="error-title">403</h2>
+      <p class="error-message">无权限访问</p>
+      <p class="error-desc">您没有权限访问此页面，请联系管理员。</p>
+      <div class="error-actions">
+        <el-button type="primary" @click="$router.push('/')">返回首页</el-button>
+      </div>
     </el-card>
   </div>
 </template>
 
 <script setup>
-const goBack = () => {
-  window.history.back()
-}
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 </script>
 
 <style scoped>
@@ -19,25 +26,43 @@ const goBack = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #f5f7fa;
+  min-height: 100vh;
+  background: #f5f5f5;
 }
 
 .error-card {
-  width: 400px;
   text-align: center;
-  padding: 30px;
+  padding: 40px;
+  max-width: 400px;
 }
 
-.error-code {
-  font-size: 60px;
-  color: #f56c6c;
+.error-icon {
+  color: #e6a23c;
   margin-bottom: 20px;
 }
 
+.error-title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
 .error-desc {
-  font-size: 18px;
-  margin-bottom: 30px;
+  font-size: 16px;
   color: #666;
+  margin-bottom: 30px;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 </style>
