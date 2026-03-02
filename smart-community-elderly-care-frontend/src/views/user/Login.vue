@@ -1,97 +1,97 @@
+<!-- src/views/user/Login.vue -->
 <template>
   <div class="login-container">
-    <el-card class="login-card" shadow="hover">
+    <div class="login-box">
       <h2 class="login-title">社区智慧养老系统</h2>
-      <el-form
-        ref="loginFormRef"
-        :model="loginForm"
-        :rules="loginRules"
-        label-width="80px"
-        class="login-form"
-      >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="loginForm.username" placeholder="请输入用户名" />
+      <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
+        <el-form-item prop="username">
+          <el-input
+            v-model="loginForm.username"
+            placeholder="请输入用户名"
+            prefix-icon="User"
+            size="large"
+          />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item prop="password">
           <el-input
             v-model="loginForm.password"
             type="password"
             placeholder="请输入密码"
+            prefix-icon="Lock"
+            size="large"
             show-password
+            @keyup.enter="handleLogin"
           />
         </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-select v-model="loginForm.role" placeholder="请选择角色">
-            <el-option label="老人" value="elder" />
-            <el-option label="家属" value="family" />
-            <el-option label="管理员" value="admin" />
-          </el-select>
+        <el-form-item>
+          <el-button
+            type="primary"
+            size="large"
+            class="login-btn"
+            :loading="loading"
+            @click="handleLogin"
+          >
+            登录
+          </el-button>
         </el-form-item>
-        <el-form-item class="login-btn">
-          <el-button type="primary" @click="handleLogin" class="btn">登录</el-button>
-          <el-button type="text" @click="goToRegister" class="register-btn">注册账号</el-button>
-        </el-form-item>
+        <div class="login-footer">
+          <span>还没有账号？</span>
+          <el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
+        </div>
       </el-form>
-    </el-card>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/pinia/userStore'
-import { userLogin } from '@/api/user'
+import { loginApi } from '@/api/user'
 
 const router = useRouter()
 const userStore = useUserStore()
 const loginFormRef = ref(null)
+const loading = ref(false)
 
-// 登录表单
 const loginForm = reactive({
   username: '',
-  password: '',
-  role: ''
+  password: ''
 })
 
-// 校验规则
-const loginRules = reactive({
+const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  role: [{ required: true, message: '请选择角色', trigger: 'change' }]
-})
-
-// 登录操作
-const handleLogin = async () => {
-  try {
-    await loginFormRef.value.validate()
-    // 调用登录接口（测试阶段可先模拟返回）
-    const res = await userLogin(loginForm)
-    // 实际项目中替换为接口返回的token和userInfo
-    const mockToken = 'mock-token-' + Date.now()
-    const mockUserInfo = {
-      userId: 1001,
-      username: loginForm.username,
-      role: loginForm.role
-    }
-    userStore.login(mockToken, mockUserInfo)
-    ElMessage.success('登录成功！')
-    // 根据角色跳转对应首页
-    if (loginForm.role === 'elder') {
-      router.push('/elder/home')
-    } else if (loginForm.role === 'family') {
-      router.push('/family/home')
-    } else if (loginForm.role === 'admin') {
-      router.push('/admin/home')
-    }
-  } catch (error) {
-    ElMessage.error('登录失败：' + (error.message || '用户名或密码错误'))
-  }
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
-// 跳转到注册页
-const goToRegister = () => {
-  router.push('/register')
+const handleLogin = async () => {
+  if (!loginFormRef.value) return
+
+  await loginFormRef.value.validate(async (valid) => {
+    if (valid) {
+      loading.value = true
+      try {
+        const res = await loginApi(loginForm)
+        userStore.login(res.token, res.userInfo)
+        ElMessage.success('登录成功')
+
+        // 根据角色跳转不同首页
+        const role = res.userInfo.role
+        if (role === 'elder') {
+          router.push('/elder/home')
+        } else if (role === 'admin') {
+          router.push('/admin/home')
+        } else if (role === 'family') {
+          router.push('/family/home')
+        }
+      } catch (error) {
+        ElMessage.error(error.message || '登录失败')
+      } finally {
+        loading.value = false
+      }
+    }
+  })
 }
 </script>
 
@@ -100,20 +100,24 @@ const goToRegister = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #f5f7fa;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.login-card {
-  width: 420px;
-  padding: 20px;
+.login-box {
+  width: 450px;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .login-title {
   text-align: center;
-  margin-bottom: 20px;
-  font-size: 20px;
-  color: #1989fa;
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 30px;
+  font-weight: 600;
 }
 
 .login-form {
@@ -121,19 +125,16 @@ const goToRegister = () => {
 }
 
 .login-btn {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  width: 100%;
+  height: 48px;
+  font-size: 18px;
+  margin-top: 10px;
 }
 
-.btn {
-  width: 180px;
-  height: 44px;
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
   font-size: 16px;
-}
-
-.register-btn {
-  font-size: 14px;
-  color: #1989fa;
+  color: #666;
 }
 </style>

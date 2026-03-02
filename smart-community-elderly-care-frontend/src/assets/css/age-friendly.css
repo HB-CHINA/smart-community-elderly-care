@@ -1,58 +1,145 @@
-/* 基础适老化：大字体、宽间距 */
-:root {
-  --font-size-base: 16px;
-  --button-height: 44px;
-  --button-font-size: 16px;
-  --input-height: 44px;
-  --input-font-size: 16px;
+/* src/assets/css/age-friendly.css */
+/* 适老化样式 */
+html {
+  font-size: 16px;
 }
 
-/* 高对比度模式：黑白强对比，无渐变，醒目边框 */
-.high-contrast {
-  --el-color-primary: #000000;
-  --el-color-danger: #ff0000;
-  --el-bg-color: #ffffff;
-  --el-text-color-primary: #000000;
-  --el-border-color: #000000;
-  --el-card-bg-color: #ffffff;
-  --el-dialog-bg-color: #ffffff;
-  filter: contrast(1.2);
+body {
+  font-size: 18px;
+  line-height: 1.8;
 }
 
-/* 全局大按钮：贴合论文4.1节，按钮尺寸≥44×44px */
-.high-contrast .el-button,
 .el-button {
-  min-height: var(--button-height) !important;
-  font-size: var(--button-font-size) !important;
-  padding: 0 20px !important;
+  font-size: 18px !important;
+  padding: 12px 20px !important;
 }
 
-/* 全局大输入框 */
-.high-contrast .el-input__inner,
-.el-input__inner {
-  height: var(--input-height) !important;
-  font-size: var(--input-font-size) !important;
+.el-input {
+  font-size: 18px !important;
 }
 
-/* 全局大文字 */
-.high-contrast,
-.high-contrast * {
-  font-size: var(--font-size-base) !important;
+.el-input-number {
+  font-size: 18px !important;
+}
+
+.el-select {
+  font-size: 18px !important;
+}
+
+.el-textarea {
+  font-size: 18px !important;
+}
+
+.el-form-item__label {
+  font-size: 18px !important;
+}
+
+.el-table {
+  font-size: 16px !important;
+}
+
+.el-table th {
+  font-size: 16px !important;
+}
+
+.el-table td {
+  font-size: 16px !important;
+}
+
+.el-pagination {
+  font-size: 16px !important;
+}
+
+/* 大按钮样式 */
+.btn-large {
+  font-size: 20px !important;
+  padding: 15px 30px !important;
+  height: auto !important;
+}
+
+/* 大图标样式 */
+.icon-large {
+  font-size: 24px !important;
+}
+
+/* 高对比度样式 */
+.high-contrast {
+  background-color: #fff !important;
   color: #000 !important;
 }
 
-/* 移除渐变、阴影，简化样式（适老化） */
-.high-contrast .el-card,
-.high-contrast .el-dialog,
-.high-contrast .el-table {
-  box-shadow: none !important;
-  border: 2px solid #000 !important;
+.high-contrast .el-card {
+  background-color: #fff !important;
+  color: #000 !important;
 }
 
-/* 表格高对比度：隔行变色为黑白 */
-.high-contrast .el-table__row:nth-child(odd) {
-  background-color: #f5f5f5 !important;
+/* 简化界面 */
+.simplified-view {
+  background-color: #f8f9fa !important;
 }
-.high-contrast .el-table__row:nth-child(even) {
-  background-color: #ffffff !important;
+
+.simplified-view .el-card {
+  background-color: #fff !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+/* 大字体模式 */
+.large-font {
+  font-size: 20px !important;
+}
+
+.large-font .el-input__inner {
+  font-size: 20px !important;
+}
+
+.large-font .el-textarea__inner {
+  font-size: 20px !important;
+}
+
+.large-font .el-select__tags-text {
+  font-size: 20px !important;
+}
+
+.large-font .el-select__caret {
+  font-size: 20px !important;
+}
+
+/* 焦点状态增强 */
+.el-input:focus,
+.el-textarea:focus,
+.el-select:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2) !important;
+}
+
+/* 悬浮按钮样式 */
+.sos-button {
+  position: fixed;
+  right: 30px;
+  bottom: 80px;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(238, 90, 111, 0.4);
+  transition: all 0.3s;
+  z-index: 1000;
+  font-size: 16px;
+}
+
+.sos-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(238, 90, 111, 0.6);
+}
+
+.sos-button span {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 2px;
 }

@@ -1,127 +1,277 @@
+<!-- src/views/health/HealthInput.vue -->
 <template>
-  <div class="health-input-container">
-    <el-card title="健康数据录入" class="health-card">
-      <el-form
-        ref="healthFormRef"
-        :model="healthForm"
-        :rules="healthRules"
-        label-width="100px"
-        class="health-form"
-      >
-        <el-form-item label="收缩压(mmHg)" prop="systolicPressure">
-          <el-input-number
-            v-model="healthForm.systolicPressure"
-            :min="50"
-            :max="250"
-            placeholder="请输入收缩压"
-            class="input-item"
-          />
-        </el-form-item>
-        <el-form-item label="舒张压(mmHg)" prop="diastolicPressure">
-          <el-input-number
-            v-model="healthForm.diastolicPressure"
-            :min="30"
-            :max="150"
-            placeholder="请输入舒张压"
-            class="input-item"
-          />
-        </el-form-item>
-        <el-form-item label="心率(次/分)" prop="heartRate">
-          <el-input-number
-            v-model="healthForm.heartRate"
-            :min="30"
-            :max="200"
-            placeholder="请输入心率"
-            class="input-item"
-          />
-        </el-form-item>
+  <div class="health-input">
+    <el-card>
+      <template #header>
+        <span class="card-title">健康数据录入</span>
+      </template>
+
+      <el-form :model="healthForm" :rules="rules" ref="healthFormRef" label-width="120px">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="收缩压" prop="systolicPressure">
+              <el-input-number
+                v-model="healthForm.systolicPressure"
+                :min="60"
+                :max="250"
+                placeholder="请输入收缩压"
+                style="width: 100%"
+              />
+              <span class="unit">mmHg</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="舒张压" prop="diastolicPressure">
+              <el-input-number
+                v-model="healthForm.diastolicPressure"
+                :min="40"
+                :max="150"
+                placeholder="请输入舒张压"
+                style="width: 100%"
+              />
+              <span class="unit">mmHg</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="血糖" prop="bloodSugar">
+              <el-input-number
+                v-model="healthForm.bloodSugar"
+                :min="2"
+                :max="30"
+                :precision="1"
+                placeholder="请输入血糖"
+                style="width: 100%"
+              />
+              <span class="unit">mmol/L</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="心率" prop="heartRate">
+              <el-input-number
+                v-model="healthForm.heartRate"
+                :min="40"
+                :max="200"
+                placeholder="请输入心率"
+                style="width: 100%"
+              />
+              <span class="unit">次/分</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="体温" prop="temperature">
+              <el-input-number
+                v-model="healthForm.temperature"
+                :min="35"
+                :max="42"
+                :precision="1"
+                placeholder="请输入体温"
+                style="width: 100%"
+              />
+              <span class="unit">℃</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="体重" prop="weight">
+              <el-input-number
+                v-model="healthForm.weight"
+                :min="30"
+                :max="150"
+                :precision="1"
+                placeholder="请输入体重"
+                style="width: 100%"
+              />
+              <span class="unit">kg</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-form-item label="备注">
           <el-input
-            v-model="healthForm.notes"
+            v-model="healthForm.remark"
             type="textarea"
-            rows="3"
-            placeholder="请输入备注（如：今日头晕）"
-            class="input-item"
+            :rows="3"
+            placeholder="请输入备注信息"
           />
         </el-form-item>
-        <el-form-item class="submit-btn">
-          <el-button type="primary" @click="submitHealthForm">提交记录</el-button>
+
+        <el-form-item>
+          <el-button type="primary" size="large" @click="handleSubmit" :loading="loading">
+            提交数据
+          </el-button>
+          <el-button size="large" @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
+    </el-card>
+
+    <!-- 健康提示卡片 -->
+    <el-card class="health-tips" v-if="healthTips.length > 0">
+      <template #header>
+        <span class="card-title">健康提示</span>
+      </template>
+      <el-alert
+        v-for="(tip, index) in healthTips"
+        :key="index"
+        :title="tip.title"
+        :type="tip.type"
+        :description="tip.content"
+        show-icon
+        :closable="false"
+        class="tip-item"
+      />
     </el-card>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/pinia/userStore'
-import { addHealthRecord } from '@/api/health'
+import { submitHealthDataApi } from '@/api/health'
 
 const userStore = useUserStore()
 const healthFormRef = ref(null)
+const loading = ref(false)
 
-// 表单数据
 const healthForm = reactive({
   systolicPressure: null,
   diastolicPressure: null,
+  bloodSugar: null,
   heartRate: null,
-  notes: ''
+  temperature: null,
+  weight: null,
+  remark: ''
 })
 
-// 表单校验规则（与后端一致：论文5.4.1数据范围校验）
-const healthRules = reactive({
-  systolicPressure: [
-    { required: true, message: '请输入收缩压', trigger: 'blur' },
-    { min: 50, max: 250, message: '收缩压范围为50-250mmHg', trigger: 'blur' }
-  ],
-  diastolicPressure: [
-    { required: true, message: '请输入舒张压', trigger: 'blur' },
-    { min: 30, max: 150, message: '舒张压范围为30-150mmHg', trigger: 'blur' }
-  ],
-  heartRate: [
-    { required: true, message: '请输入心率', trigger: 'blur' },
-    { min: 30, max: 200, message: '心率范围为30-200次/分', trigger: 'blur' }
-  ]
-})
+const rules = {
+  systolicPressure: [{ required: true, message: '请输入收缩压', trigger: 'blur' }],
+  diastolicPressure: [{ required: true, message: '请输入舒张压', trigger: 'blur' }],
+  bloodSugar: [{ required: true, message: '请输入血糖', trigger: 'blur' }],
+  heartRate: [{ required: true, message: '请输入心率', trigger: 'blur' }]
+}
 
-// 提交健康记录
-const submitHealthForm = async () => {
-  await healthFormRef.value.validate()
-  try {
-    await addHealthRecord(userStore.userInfo.userId, healthForm)
-    ElMessage.success('健康记录提交成功！')
-    // 重置表单
-    healthFormRef.value.resetFields()
-  } catch (error) {
-    ElMessage.error('健康记录提交失败：' + error.message)
+const healthTips = computed(() => {
+  const tips = []
+
+  // 血压判断
+  if (healthForm.systolicPressure && healthForm.diastolicPressure) {
+    if (healthForm.systolicPressure >= 140 || healthForm.diastolicPressure >= 90) {
+      tips.push({
+        title: '血压偏高',
+        type: 'warning',
+        content: '您的血压偏高，建议注意饮食，适当运动，定期监测血压变化。'
+      })
+    } else if (healthForm.systolicPressure < 90 || healthForm.diastolicPressure < 60) {
+      tips.push({
+        title: '血压偏低',
+        type: 'warning',
+        content: '您的血压偏低，建议多补充营养，避免突然站立。'
+      })
+    }
   }
+
+  // 血糖判断
+  if (healthForm.bloodSugar) {
+    if (healthForm.bloodSugar > 7.0) {
+      tips.push({
+        title: '血糖偏高',
+        type: 'warning',
+        content: '您的空腹血糖偏高，建议控制饮食，减少糖分摄入，必要时咨询医生。'
+      })
+    } else if (healthForm.bloodSugar < 3.9) {
+      tips.push({
+        title: '血糖偏低',
+        type: 'error',
+        content: '您的血糖偏低，建议及时补充糖分，如出现头晕、出汗等症状请立即就医。'
+      })
+    }
+  }
+
+  // 心率判断
+  if (healthForm.heartRate) {
+    if (healthForm.heartRate > 100 || healthForm.heartRate < 60) {
+      tips.push({
+        title: '心率异常',
+        type: 'warning',
+        content: '您的心率不在正常范围内，建议咨询医生。'
+      })
+    }
+  }
+
+  // 体温判断
+  if (healthForm.temperature) {
+    if (healthForm.temperature > 37.3) {
+      tips.push({
+        title: '体温偏高',
+        type: 'error',
+        content: '您的体温偏高，建议多喝水，注意休息，如持续发热请及时就医。'
+      })
+    }
+  }
+
+  return tips
+})
+
+const handleSubmit = async () => {
+  if (!healthFormRef.value) return
+
+  await healthFormRef.value.validate(async (valid) => {
+    if (valid) {
+      loading.value = true
+      try {
+        await submitHealthDataApi({
+          ...healthForm,
+          elderId: userStore.userInfo.id
+        })
+        ElMessage.success('健康数据提交成功')
+        handleReset()
+      } catch (error) {
+        ElMessage.error(error.message || '提交失败')
+      } finally {
+        loading.value = false
+      }
+    }
+  })
+}
+
+const handleReset = () => {
+  if (healthFormRef.value) {
+    healthFormRef.value.resetFields()
+  }
+  healthForm.remark = ''
 }
 </script>
 
 <style scoped>
-.health-input-container {
+.health-input {
   padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
 }
-.health-card {
-  border-radius: 8px;
+
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
 }
-.health-form {
+
+.unit {
+  margin-left: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.health-tips {
   margin-top: 20px;
 }
-.input-item {
-  width: 100%;
-  font-size: 16px;
+
+.tip-item {
+  margin-bottom: 10px;
 }
-.submit-btn {
-  text-align: center;
-  margin-top: 30px;
-}
-.submit-btn .el-button {
-  width: 200px;
-  height: 48px;
-  font-size: 18px;
+
+.tip-item:last-child {
+  margin-bottom: 0;
 }
 </style>

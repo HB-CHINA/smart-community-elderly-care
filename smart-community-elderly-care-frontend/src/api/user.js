@@ -1,16 +1,8 @@
+// src/api/user.js
 import request from '@/utils/request'
 
-// 用户注册（贴合论文5.3.1）
-export const userRegister = (data) => {
-  return request({
-    url: '/user/register',
-    method: 'post',
-    data
-  })
-}
-
-// 用户登录（贴合论文5.3.1）
-export const userLogin = (data) => {
+// 用户登录
+export function loginApi(data) {
   return request({
     url: '/user/login',
     method: 'post',
@@ -18,33 +10,37 @@ export const userLogin = (data) => {
   })
 }
 
-// 头像上传（贴合论文5.3.3）
-export const uploadAvatar = (file) => {
-  const formData = new FormData()
-  formData.append('file', file)
+// 用户注册
+export function registerApi(data) {
   return request({
-    url: '/user/upload/avatar',
+    url: '/user/register',
     method: 'post',
-    data: formData,
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+    data
+  })
+}
+
+// 更新用户信息
+export function updateUserInfoApi(data) {
+  return request({
+    url: '/user/update',
+    method: 'put',
+    data
+  })
+}
+
+// 上传头像
+export function uploadAvatarApi(data) {
+  return request({
+    url: '/user/avatar/upload',
+    method: 'post',
+    data
   })
 }
 
 // 获取用户信息
-export const getUserInfo = () => {
+export function getUserInfoApi(id) {
   return request({
-    url: '/user/info',
+    url: `/user/${id}`,
     method: 'get'
-  })
-}
-
-// 修改用户信息（紧急联系人/密码）
-export const updateUserInfo = (data) => {
-  return request({
-    url: '/user/info',
-    method: 'put',
-    data
   })
 }

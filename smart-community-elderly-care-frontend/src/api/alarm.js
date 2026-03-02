@@ -1,17 +1,36 @@
+// src/api/alarm.js
 import request from '@/utils/request'
 
-// 触发SOS紧急求助
-export const triggerSos = (userId) => {
+// 触发SOS报警
+export function triggerSOSApi() {
   return request({
-    url: `/alarm/sos/${userId}`,
+    url: '/alarm/sos',
     method: 'post'
   })
 }
 
-// 查询报警记录
-export const getAlarmRecord = (userId) => {
+// 获取报警列表
+export function getAlarmListApi(params) {
   return request({
-    url: `/alarm/record/${userId}`,
+    url: '/alarm/list',
+    method: 'get',
+    params
+  })
+}
+
+// 处理报警
+export function handleAlarmApi(data) {
+  return request({
+    url: '/alarm/handle',
+    method: 'post',
+    data
+  })
+}
+
+// 获取报警详情
+export function getAlarmDetailApi(id) {
+  return request({
+    url: `/alarm/${id}`,
     method: 'get'
   })
 }

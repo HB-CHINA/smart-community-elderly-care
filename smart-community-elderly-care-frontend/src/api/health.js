@@ -1,36 +1,37 @@
+// src/api/health.js
 import request from '@/utils/request'
 
-// 健康数据录入（贴合论文5.4.1）
-export const addHealthRecord = (userId, data) => {
+// 提交健康数据
+export function submitHealthDataApi(data) {
   return request({
-    url: `/health/${userId}`,
+    url: '/health/submit',
     method: 'post',
     data
   })
 }
 
-// 查询健康历史数据（贴合论文5.4.1）
-export const getHealthHistory = (userId) => {
+// 获取健康历史
+export function getHealthHistoryApi(params) {
   return request({
-    url: `/health/${userId}/history`,
-    method: 'get'
-  })
-}
-
-// 健康数据Excel导出（贴合论文5.4.1）
-export const exportHealthExcel = (params) => {
-  return request({
-    url: '/health/export',
+    url: '/health/history',
     method: 'get',
-    params,
-    responseType: 'blob' // 二进制流（Excel文件）
+    params
   })
 }
 
-// 查询健康异常报警
-export const getHealthAlarm = (userId) => {
+// 获取健康趋势
+export function getHealthTrendApi(params) {
   return request({
-    url: `/health/${userId}/alarm`,
+    url: '/health/trend',
+    method: 'get',
+    params
+  })
+}
+
+// 获取老人健康数据（家属端用）
+export function getElderHealthApi(elderId) {
+  return request({
+    url: `/health/elder/${elderId}`,
     method: 'get'
   })
 }
