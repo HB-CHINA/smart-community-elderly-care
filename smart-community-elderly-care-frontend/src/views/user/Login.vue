@@ -4,11 +4,11 @@
     <div class="login-box">
       <h2 class="login-title">社区智慧养老系统</h2>
       <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
-        <el-form-item prop="username">
+        <el-form-item prop="phone">
           <el-input
-            v-model="loginForm.username"
-            placeholder="请输入用户名"
-            prefix-icon="User"
+            v-model="loginForm.phone"
+            placeholder="请输入手机号"
+            prefix-icon="Phone"
             size="large"
           />
         </el-form-item>
@@ -56,12 +56,15 @@ const loginFormRef = ref(null)
 const loading = ref(false)
 
 const loginForm = reactive({
-  username: '',
+  phone: '',
   password: ''
 })
 
 const rules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
+  ],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
@@ -73,11 +76,13 @@ const handleLogin = async () => {
       loading.value = true
       try {
         const res = await loginApi(loginForm)
-        userStore.login(res.token, res.userInfo)
+        // 后端返回格式: { user, token }
+        const { user, token } = res.data || res
+        userStore.login(token, user)
         ElMessage.success('登录成功')
 
         // 根据角色跳转不同首页
-        const role = res.userInfo.role
+        const role = user.role
         if (role === 'elder') {
           router.push('/elder/home')
         } else if (role === 'admin') {

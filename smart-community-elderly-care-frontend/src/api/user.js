@@ -1,7 +1,7 @@
 // src/api/user.js
 import request from '@/utils/request'
 
-// 用户登录
+// 用户登录（后端期望 phone 和 password 字段）
 export function loginApi(data) {
   return request({
     url: '/user/login',
@@ -19,28 +19,38 @@ export function registerApi(data) {
   })
 }
 
-// 更新用户信息
-export function updateUserInfoApi(data) {
-  return request({
-    url: '/user/update',
-    method: 'put',
-    data
-  })
-}
-
-// 上传头像
-export function uploadAvatarApi(data) {
-  return request({
-    url: '/user/avatar/upload',
-    method: 'post',
-    data
-  })
-}
-
 // 获取用户信息
 export function getUserInfoApi(id) {
   return request({
     url: `/user/${id}`,
     method: 'get'
+  })
+}
+
+// 获取所有用户
+export function getAllUsersApi() {
+  return request({
+    url: '/user/all',
+    method: 'get'
+  })
+}
+
+// 根据角色获取用户
+export function getUsersByRoleApi(role) {
+  return request({
+    url: `/user/role/${role}`,
+    method: 'get'
+  })
+}
+
+// 上传头像（后端路径: /user/upload/avatar）
+export function uploadAvatarApi(formData) {
+  return request({
+    url: '/user/upload/avatar',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }

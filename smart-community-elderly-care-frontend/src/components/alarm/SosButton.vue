@@ -10,16 +10,18 @@
     >
       紧急求助
     </el-button>
+
     <!-- 二次确认弹窗 -->
     <el-dialog
       title="紧急求助确认"
       v-model="showConfirm"
       width="300px"
-      confirm-button-text="确认求助"
-      cancel-button-text="取消"
-      @confirm="handleSos"
     >
       <p class="sos-tip">点击确认后，系统将立即通知社区管理员和您的家属！</p>
+      <template #footer>
+        <el-button @click="showConfirm = false">取消</el-button>
+        <el-button type="danger" @click="handleSos">确认求助</el-button>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -28,7 +30,7 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/pinia/userStore'
-import { triggerSos } from '@/api/alarm'
+import { triggerSOSApi } from '@/api/alarm'
 
 const showConfirm = ref(false)
 const userStore = useUserStore()
@@ -38,11 +40,15 @@ const showSosConfirm = () => {
   showConfirm.value = true
 }
 
-// 触发SOS求助（测试阶段模拟）
+// 触发SOS求助
 const handleSos = async () => {
   try {
-    // 实际项目替换为真实接口调用
-    // await triggerSos(userStore.userInfo.userId)
+    const userInfo = userStore.userInfo
+    await triggerSOSApi({
+      elderId: userInfo.userId,
+      alarmType: 'SOS',
+      description: '老人触发紧急求助'
+    })
     ElMessage.success('求助信号已发送，管理员将尽快响应！')
     showConfirm.value = false
   } catch (error) {
@@ -52,13 +58,14 @@ const handleSos = async () => {
 </script>
 
 <style scoped>
-/* 适老化大按钮：48×48px，固定悬浮，红色醒目 */
+/* 适老化大按钮：固定悬浮，红色醒目 */
 .sos-btn-container {
   position: fixed;
   bottom: 30px;
   right: 30px;
   z-index: 9999;
 }
+
 .sos-btn {
   width: 120px;
   height: 48px;
@@ -66,6 +73,7 @@ const handleSos = async () => {
   background-color: #f56c6c;
   border: none;
 }
+
 .sos-tip {
   font-size: 16px;
   color: #f56c6c;

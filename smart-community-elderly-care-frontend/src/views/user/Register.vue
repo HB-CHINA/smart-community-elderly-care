@@ -4,11 +4,11 @@
     <div class="register-box">
       <h2 class="register-title">用户注册</h2>
       <el-form :model="registerForm" :rules="rules" ref="registerFormRef" class="register-form">
-        <el-form-item prop="username">
+        <el-form-item prop="phone">
           <el-input
-            v-model="registerForm.username"
-            placeholder="请输入用户名"
-            prefix-icon="User"
+            v-model="registerForm.phone"
+            placeholder="请输入手机号"
+            prefix-icon="Phone"
             size="large"
           />
         </el-form-item>
@@ -32,19 +32,11 @@
             show-password
           />
         </el-form-item>
-        <el-form-item prop="realName">
+        <el-form-item prop="name">
           <el-input
-            v-model="registerForm.realName"
+            v-model="registerForm.name"
             placeholder="请输入真实姓名"
             prefix-icon="UserFilled"
-            size="large"
-          />
-        </el-form-item>
-        <el-form-item prop="phone">
-          <el-input
-            v-model="registerForm.phone"
-            placeholder="请输入手机号"
-            prefix-icon="Phone"
             size="large"
           />
         </el-form-item>
@@ -53,6 +45,14 @@
             <el-option label="老人" value="elder" />
             <el-option label="家属" value="family" />
           </el-select>
+        </el-form-item>
+        <el-form-item prop="emergencyContact">
+          <el-input
+            v-model="registerForm.emergencyContact"
+            placeholder="请输入紧急联系人电话（选填）"
+            prefix-icon="Phone"
+            size="large"
+          />
         </el-form-item>
         <el-form-item>
           <el-button
@@ -85,12 +85,12 @@ const registerFormRef = ref(null)
 const loading = ref(false)
 
 const registerForm = reactive({
-  username: '',
+  phone: '',
   password: '',
   confirmPassword: '',
-  realName: '',
-  phone: '',
-  role: 'elder'
+  name: '',
+  role: 'elder',
+  emergencyContact: ''
 })
 
 const validatePass = (rule, value, callback) => {
@@ -102,14 +102,13 @@ const validatePass = (rule, value, callback) => {
 }
 
 const rules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  confirmPassword: [{ required: true, validator: validatePass, trigger: 'blur' }],
-  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
   phone: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
     { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
   ],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  confirmPassword: [{ required: true, validator: validatePass, trigger: 'blur' }],
+  name: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
   role: [{ required: true, message: '请选择角色', trigger: 'change' }]
 }
 
@@ -120,7 +119,13 @@ const handleRegister = async () => {
     if (valid) {
       loading.value = true
       try {
-        await registerApi(registerForm)
+        await registerApi({
+          phone: registerForm.phone,
+          password: registerForm.password,
+          name: registerForm.name,
+          role: registerForm.role,
+          emergencyContact: registerForm.emergencyContact
+        })
         ElMessage.success('注册成功，请登录')
         router.push('/login')
       } catch (error) {

@@ -7,7 +7,7 @@
         <el-card class="welcome-card">
           <div class="welcome-content">
             <div class="welcome-text">
-              <h2>欢迎您，{{ userInfo.realName }}</h2>
+              <h2>欢迎您，{{ userInfo.name }}</h2>
               <p>今天是 {{ currentDate }}，祝您身体健康</p>
             </div>
             <el-icon class="welcome-icon"><Sunny /></el-icon>
@@ -63,8 +63,8 @@
             </div>
           </template>
           <el-list>
-            <el-list-item v-for="notice in latestNotices" :key="notice.id">
-              <el-list-item-meta :title="notice.title" :description="notice.publishTime" />
+            <el-list-item v-for="notice in latestNotices" :key="notice.noticeId">
+              <el-list-item-meta :title="notice.title" :description="formatDate(notice.publishTime)" />
             </el-list-item>
           </el-list>
         </el-card>
@@ -86,10 +86,22 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/pinia/userStore'
 import { triggerSOSApi } from '@/api/alarm'
 import { getNoticeListApi } from '@/api/notice'
+import { formatDate } from '@/utils/format'
+import {
+  Home,
+  DocumentAdd,
+  Document,
+  ShoppingCart,
+  List,
+  Message,
+  User,
+  Warning,
+  Sunny
+} from '@element-plus/icons-vue'
 
 const router = useRouter()
 const userStore = useUserStore()
-const userInfo = computed(() => userStore.userInfo)
+const userInfo = computed(() => userStore.userInfo || {})
 
 const currentDate = computed(() => {
   const now = new Date()
@@ -122,8 +134,8 @@ onMounted(async () => {
 
 const loadNotices = async () => {
   try {
-    const res = await getNoticeListApi({ pageNum: 1, pageSize: 5 })
-    latestNotices.value = res.records || []
+    const res = await getNoticeListApi()
+    latestNotices.value = (res.data || []).slice(0, 5)
   } catch (error) {
     console.error('加载公告失败:', error)
   }
@@ -146,7 +158,11 @@ const handleSOS = async () => {
       }
     )
 
-    await triggerSOSApi()
+    await triggerSOSApi({
+      elderId: userInfo.value.userId,
+      alarmType: 'SOS',
+      description: '老人触发紧急求助'
+    })
     ElMessage.success('紧急求助已发送，请保持电话畅通')
   } catch (error) {
     if (error !== 'cancel') {

@@ -10,17 +10,15 @@
 
       <!-- 监护的老人列表 -->
       <el-row :gutter="20" class="elder-list">
-        <el-col :xs="24" :sm="12" :md="6" v-for="elder in elderList" :key="elder.id">
+        <el-col :xs="24" :sm="12" :md="6" v-for="elder in elderList" :key="elder.userId">
           <el-card class="elder-card" @click="handleSelectElder(elder)">
             <div class="elder-info">
               <el-avatar :size="60" :src="elder.avatar || defaultAvatar" />
               <div class="elder-details">
-                <div class="elder-name">{{ elder.realName }}</div>
-                <div class="elder-age">{{ elder.age }}岁</div>
+                <div class="elder-name">{{ elder.name }}</div>
+                <div class="elder-phone">{{ formatPhone(elder.phone) }}</div>
                 <div class="elder-status">
-                  <el-tag :type="elder.status === 'normal' ? 'success' : 'danger'">
-                    {{ elder.status === 'normal' ? '正常' : '异常' }}
-                  </el-tag>
+                  <el-tag type="success">正常</el-tag>
                 </div>
               </div>
             </div>
@@ -33,7 +31,7 @@
     <el-card v-if="selectedElder" class="health-data">
       <template #header>
         <div class="card-header">
-          <span class="card-title">{{ selectedElder.realName }}的健康数据</span>
+          <span class="card-title">{{ selectedElder.name }}的健康数据</span>
         </div>
       </template>
 
@@ -43,7 +41,7 @@
           <el-card class="health-card">
             <div class="health-item">
               <div class="health-label">血压</div>
-              <div class="health-value">{{ selectedElder.healthData.bloodPressure || '正常' }}</div>
+              <div class="health-value">{{ healthData.bloodPressure || '--' }}</div>
             </div>
           </el-card>
         </el-col>
@@ -51,7 +49,7 @@
           <el-card class="health-card">
             <div class="health-item">
               <div class="health-label">血糖</div>
-              <div class="health-value">{{ selectedElder.healthData.bloodSugar || '正常' }}</div>
+              <div class="health-value">{{ healthData.bloodSugar || '--' }}</div>
             </div>
           </el-card>
         </el-col>
@@ -59,7 +57,7 @@
           <el-card class="health-card">
             <div class="health-item">
               <div class="health-label">心率</div>
-              <div class="health-value">{{ selectedElder.healthData.heartRate || '正常' }}</div>
+              <div class="health-value">{{ healthData.heartRate || '--' }}</div>
             </div>
           </el-card>
         </el-col>
@@ -67,7 +65,7 @@
           <el-card class="health-card">
             <div class="health-item">
               <div class="health-label">体温</div>
-              <div class="health-value">{{ selectedElder.healthData.temperature || '正常' }}</div>
+              <div class="health-value">{{ healthData.temperature || '--' }}</div>
             </div>
           </el-card>
         </el-col>
@@ -85,15 +83,15 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getFamilyElderListApi, getElderHealthApi } from '@/api/health'
+import { getFamilyElderListApi, getLatestHealthRecordApi, getHealthTrendApi } from '@/api/health'
+import { formatPhone } from '@/utils/format'
 import * as echarts from 'echarts'
 
-const router = useRouter()
 const elderList = ref([])
 const selectedElder = ref(null)
+const healthData = ref({})
 const trendChart = ref(null)
 let chartInstance = null
 
@@ -106,7 +104,7 @@ onMounted(async () => {
 const loadElderList = async () => {
   try {
     const res = await getFamilyElderListApi()
-    elderList.value = res || []
+    elderList.value = res.data || []
   } catch (error) {
     ElMessage.error(error.message || '加载老人列表失败')
   }
@@ -114,15 +112,14 @@ const loadElderList = async () => {
 
 const handleSelectElder = async (elder) => {
   selectedElder.value = elder
-  await loadElderHealth(elder.id)
+  await loadElderHealth(elder.userId)
 }
 
 const loadElderHealth = async (elderId) => {
   try {
-    const res = await getElderHealthApi(elderId)
-    if (selectedElder.value) {
-      selectedElder.value.healthData = res
-    }
+    // 获取最新健康数据
+    const res = await getLatestHealthRecordApi(elderId)
+    healthData.value = res.data || {}
 
     // 初始化图表
     if (chartInstance) {
@@ -130,36 +127,30 @@ const loadElderHealth = async (elderId) => {
     }
     chartInstance = echarts.init(trendChart.value)
 
+    // 获取趋势数据
+    const endDate = new Date().toISOString().split('T')[0]
+    const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
+    let trendData = { dates: [], bloodPressures: [], bloodSugars: [], heartRates: [] }
+    try {
+      const trendRes = await getHealthTrendApi(elderId, startDate, endDate)
+      trendData = trendRes.data || trendData
+    } catch (e) {
+      console.log('获取趋势数据失败，使用默认数据')
+    }
+
     const option = {
-      tooltip: {
-        trigger: 'axis'
-      },
-      legend: {
-        data: ['血压', '血糖', '心率']
-      },
+      tooltip: { trigger: 'axis' },
+      legend: { data: ['血压', '血糖', '心率'] },
       xAxis: {
         type: 'category',
-        data: res.dates || []
+        data: trendData.dates.length > 0 ? trendData.dates : ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
       },
-      yAxis: {
-        type: 'value'
-      },
+      yAxis: { type: 'value' },
       series: [
-        {
-          name: '血压',
-          type: 'line',
-          data: res.bloodPressures || []
-        },
-        {
-          name: '血糖',
-          type: 'line',
-          data: res.bloodSugars || []
-        },
-        {
-          name: '心率',
-          type: 'line',
-          data: res.heartRates || []
-        }
+        { name: '血压', type: 'line', data: trendData.bloodPressures || [] },
+        { name: '血糖', type: 'line', data: trendData.bloodSugars || [] },
+        { name: '心率', type: 'line', data: trendData.heartRates || [] }
       ]
     }
 
@@ -170,9 +161,20 @@ const loadElderHealth = async (elderId) => {
 }
 
 // 窗口大小改变时重新渲染图表
-window.addEventListener('resize', () => {
+const handleResize = () => {
   if (chartInstance) {
     chartInstance.resize()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+  if (chartInstance) {
+    chartInstance.dispose()
   }
 })
 </script>
@@ -222,7 +224,7 @@ window.addEventListener('resize', () => {
   margin-bottom: 5px;
 }
 
-.elder-age {
+.elder-phone {
   font-size: 14px;
   color: #666;
   margin-bottom: 5px;

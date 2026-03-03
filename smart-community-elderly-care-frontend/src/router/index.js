@@ -17,6 +17,7 @@ const router = createRouter({
       component: () => import('@/views/user/Register.vue'),
       meta: { title: '注册' }
     },
+    // 老人端路由
     {
       path: '/elder',
       component: () => import('@/layout/ElderLayout.vue'),
@@ -38,6 +39,12 @@ const router = createRouter({
           name: 'elderHealthHistory',
           component: () => import('@/views/health/HealthHistory.vue'),
           meta: { title: '健康历史' }
+        },
+        {
+          path: 'health/trend',
+          name: 'elderHealthTrend',
+          component: () => import('@/views/health/trend.vue'),
+          meta: { title: '健康趋势' }
         },
         {
           path: 'order',
@@ -65,6 +72,7 @@ const router = createRouter({
         }
       ]
     },
+    // 管理员端路由
     {
       path: '/admin',
       component: () => import('@/layout/AdminLayout.vue'),
@@ -82,6 +90,18 @@ const router = createRouter({
           meta: { title: '用户管理' }
         },
         {
+          path: 'health/monitor',
+          name: 'adminHealthMonitor',
+          component: () => import('@/views/health/index.vue'),
+          meta: { title: '健康监控' }
+        },
+        {
+          path: 'order/manage',
+          name: 'adminOrderManage',
+          component: () => import('@/views/admin/OrderManage.vue'),
+          meta: { title: '订单管理' }
+        },
+        {
           path: 'alarm/handle',
           name: 'adminAlarmHandle',
           component: () => import('@/views/admin/AlarmHandle.vue'),
@@ -92,9 +112,16 @@ const router = createRouter({
           name: 'adminNoticePublish',
           component: () => import('@/views/admin/NoticePublish.vue'),
           meta: { title: '发布公告' }
+        },
+        {
+          path: 'stats/export',
+          name: 'adminStatsExport',
+          component: () => import('@/views/admin/statistics.vue'),
+          meta: { title: '数据导出' }
         }
       ]
     },
+    // 家属端路由
     {
       path: '/family',
       component: () => import('@/layout/FamilyLayout.vue'),
@@ -110,9 +137,16 @@ const router = createRouter({
           name: 'familyElderHealth',
           component: () => import('@/views/family/ElderHealth.vue'),
           meta: { title: '老人健康监护' }
+        },
+        {
+          path: 'profile',
+          name: 'familyProfile',
+          component: () => import('@/views/user/Profile.vue'),
+          meta: { title: '个人中心' }
         }
       ]
     },
+    // 错误页面
     {
       path: '/error/401',
       name: 'error401',
@@ -125,6 +159,13 @@ const router = createRouter({
       component: () => import('@/views/error/403.vue'),
       meta: { title: '无权限' }
     },
+    {
+      path: '/error/404',
+      name: 'error404',
+      component: () => import('@/views/error/404.vue'),
+      meta: { title: '页面不存在' }
+    },
+    // 404 兜底
     {
       path: '/:pathMatch(.*)*',
       redirect: '/error/404'
